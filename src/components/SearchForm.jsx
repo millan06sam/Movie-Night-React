@@ -18,7 +18,8 @@ export default function SearchForm({ onSearch }) {
           type="search"
           value={query}
           onChange={event => setQuery(event.target.value)}
-          placeholder="Search the sample movies"
+          placeholder="For example, Inception"
+          maxLength={100}
         />
 
         <button type="submit">Search</button>

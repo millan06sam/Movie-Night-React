@@ -5,6 +5,56 @@
   margin-top: 24px;
 }
 
+label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.search-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+input,
+button {
+  padding: 10px;
+  border: 1px solid #888;
+  border-radius: 4px;
+  color: #222;
+  background: white;
+  font: inherit;
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #444;
+  outline-offset: 4px;
+}
+
+.error {
+  color: #a21b1b;
+}
+
+footer {
+  margin-top: 32px;
+  font-size: 12px;
+}
+
+.tmdb-logo {
+  height: auto;
+}
+
 .movie-card {
   padding: 20px;
   border: 1px solid #bbb;
