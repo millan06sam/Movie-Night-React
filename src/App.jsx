@@ -1,17 +1,24 @@
 import { useEffect, useState } from "react";
 import SearchForm from "./components/SearchForm.jsx";
 import MovieList from "./components/MovieList.jsx";
+import MovieFilters from "./components/MovieFilters.jsx";
+import RatingSummary from "./components/RatingSummary.jsx";
 import { searchMovies } from "./api.js";
-import { normalizeMovies } from "./logic.js";
+import { normalizeMovies, getMovieYears, filterMovies, summarizeRatings } from "./logic.js";
 import "./App.css";
 
 export default function App() {
 
   const [search, setSearch] = useState(null);
   const [request, setRequest] = useState({ status: "idle", movies: [], error: "" });
+  const [filters, setFilters] = useState({ year: "", minimumRating: 0 });
+  const years = getMovieYears(request.movies);
+  const visibleMovies = filterMovies(request.movies, filters);
+  const ratingSummary = summarizeRatings(visibleMovies);
 
   function handleSearch(query) {
     const title = query.trim();
+    setFilters({ year: "", minimumRating: 0 });
     setRequest({ status: title === "" ? "idle" : "loading", movies: [], error: "" });
     setSearch({ query: title });
   }
@@ -63,10 +70,16 @@ export default function App() {
 
       <section aria-labelledby="movies-heading">
         <h2 id="movies-heading">Search results</h2>
+        <MovieFilters
+          years={years}
+          filters={filters}
+          onChange={setFilters}
+          disabled={request.status !== "success" || request.movies.length === 0}
+        />
         <p role="status">
           {request.status === "idle" && "Search for a movie title to get started."}
           {request.status === "loading" && `Searching for "${search.query}"…`}
-          {request.status === "success" && `Showing ${request.movies.length} movies from the first page of results for "${search.query}".`}
+          {request.status === "success" && `Showing ${visibleMovies.length} of ${request.movies.length} loaded movies for "${search.query}".`}
         </p>
         {request.status === "error" && (
           <div>
@@ -75,7 +88,17 @@ export default function App() {
           </div>
         )}
         <div aria-busy={request.status === "loading"}>
-          {request.status === "success" && <MovieList movies={request.movies} />}
+          {request.status === "success" && (
+            <>
+              <RatingSummary summary={ratingSummary} />
+              <MovieList
+                movies={visibleMovies}
+                emptyMessage={request.movies.length === 0
+                  ? "No movies found. Try another title."
+                  : "No movies match these filters. Try another year or a lower rating."}
+              />
+            </>
+          )}
         </div>
       </section>
       <footer aria-label="Credits">

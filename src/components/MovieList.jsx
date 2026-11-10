@@ -1,8 +1,8 @@
 import MovieCard from "./MovieCard.jsx";
 
-export default function MovieList({ movies }) {
+export default function MovieList({ movies, emptyMessage = "No movies found. Try another title." }) {
   if (movies.length === 0) {
-    return <p>No movies match your search. Try another title.</p>;
+    return <p>{emptyMessage}</p>;
   }
 
   return (

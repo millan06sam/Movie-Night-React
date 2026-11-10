@@ -22,3 +22,35 @@ export function normalizeMovies(results) {
         ? movie.overview : "No summary available.",
     }));
 }
+
+export function getMovieYears(movies) {
+  return [...new Set(movies.map(movie => movie.year))]
+    .filter(year => year !== null)
+    .sort((first, second) => second - first);
+}
+
+export function filterMovies(movies, { year = "", minimumRating = 0 } = {}) {
+  return movies.filter(movie => {
+    const matchesYear = year === "" || movie.year === Number(year);
+    const matchesRating = minimumRating === 0
+      || (movie.rating !== null && movie.rating >= minimumRating);
+    return matchesYear && matchesRating;
+  });
+}
+
+export function summarizeRatings(movies) {
+  const totals = movies.reduce((summary, movie) => {
+    if (Number.isFinite(movie.rating) && movie.rating >= 0 && movie.rating <= 10) {
+      summary.ratedCount++;
+      summary.ratingSum += movie.rating;
+    }
+
+    return summary;
+  }, { ratedCount: 0, ratingSum: 0 });
+
+  return {
+    ratedCount: totals.ratedCount,
+    unratedCount: movies.length - totals.ratedCount,
+    averageRating: totals.ratedCount === 0 ? null : totals.ratingSum / totals.ratedCount,
+  };
+}
