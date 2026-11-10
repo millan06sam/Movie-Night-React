@@ -1,28 +1,35 @@
-.movie-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-  gap: 16px;
-  margin-top: 24px;
+form,
+fieldset,
+.score-summary,
+.movie-card {
+  padding: 20px;
+  border: 1px solid #bccdbb;
+  border-radius: 10px;
+  background: #fffef8;
 }
 
 label {
   display: block;
   margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
-.search-controls {
+.search-controls,
+.filter-controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
 }
 
 input,
 button,
 select {
-  padding: 10px;
-  border: 1px solid #888;
-  border-radius: 4px;
-  color: #222;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #829889;
+  border-radius: 6px;
+  color: #243b32;
   background: white;
   font: inherit;
 }
@@ -32,88 +39,147 @@ input {
   min-width: 0;
 }
 
+input::placeholder {
+  color: #65746b;
+}
+
 button {
+  border-color: #315c45;
+  color: white;
+  background: #315c45;
+  font-weight: 700;
   cursor: pointer;
+}
+
+button:hover {
+  background: #234532;
 }
 
 input:focus-visible,
 button:focus-visible,
 select:focus-visible,
-a:focus-visible {
-  outline: 3px solid #444;
+a:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #537e49;
   outline-offset: 4px;
-}
-
-.error {
-  color: #a21b1b;
 }
 
 fieldset,
 .score-summary {
   min-width: 0;
   margin: 20px 0;
-  padding: 16px;
-  border: 1px solid #bbb;
-  border-radius: 8px;
 }
 
-.filter-controls,
-.score-totals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px 24px;
+legend {
+  padding: 0 8px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .filter-controls > div {
+  flex: 1;
   min-width: 0;
 }
 
 select {
-  max-width: 100%;
+  width: 100%;
+}
+
+fieldset:disabled {
+  opacity: 0.65;
+}
+
+.score-summary {
+  background: #edf3e8;
 }
 
 .score-summary h3 {
   margin-top: 0;
 }
 
+.score-totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.score-totals dt {
+  color: #4f6559;
+  font-size: 14px;
+}
+
 .score-totals dd {
   margin: 4px 0 0;
+  font-size: 22px;
   font-weight: 700;
 }
 
 fieldset p,
 .score-summary p {
   margin-bottom: 0;
+  color: #4f6559;
   font-size: 13px;
 }
 
-footer {
-  margin-top: 32px;
-  font-size: 12px;
+.movie-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
+  margin-top: 24px;
 }
 
 .movie-card {
-  padding: 20px;
-  border: 1px solid #bbb;
-  border-radius: 8px;
-  background: #fff;
   overflow-wrap: anywhere;
 }
 
 .movie-card h3 {
   margin: 0 0 12px;
+  font-size: 20px;
 }
 
 .movie-meta {
-  color: #555;
+  color: #4f6559;
   font-size: 14px;
 }
 
 summary {
+  color: #275e43;
   cursor: pointer;
 }
 
-summary:focus-visible {
-  outline: 3px solid #444;
-  outline-offset: 4px;
+.error {
+  padding: 12px 16px;
+  border: 1px solid #d7a698;
+  border-radius: 6px;
+  color: #842f26;
+  background: #fff0e9;
+}
+
+footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #bccdbb;
+  color: #4f6559;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .movie-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-controls > div {
+    flex-basis: 100%;
+  }
+
+  .score-totals {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .search-controls button {
+    width: 100%;
+  }
 }
