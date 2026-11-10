@@ -2,38 +2,37 @@ import { useEffect, useState } from "react";
 import SearchForm from "./components/SearchForm.jsx";
 import MovieList from "./components/MovieList.jsx";
 import MovieFilters from "./components/MovieFilters.jsx";
-import RatingSummary from "./components/RatingSummary.jsx";
-import { searchMovies } from "./api.js";
-import { normalizeMovies, getMovieYears, filterMovies, summarizeRatings } from "./logic.js";
+import ScoreSummary from "./components/ScoreSummary.jsx";
+import { getMovies } from "./api.js";
+import { normalizeMovies, getMovieYears, filterMovies, summarizeScores } from "./logic.js";
 import "./App.css";
 
 export default function App() {
-
-  const [search, setSearch] = useState(null);
-  const [request, setRequest] = useState({ status: "idle", movies: [], error: "" });
-  const [filters, setFilters] = useState({ year: "", minimumRating: 0 });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [request, setRequest] = useState({ status: "loading", movies: [], error: "" });
+  const [filters, setFilters] = useState({ year: "", minimumScore: 0 });
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const years = getMovieYears(request.movies);
-  const visibleMovies = filterMovies(request.movies, filters);
-  const ratingSummary = summarizeRatings(visibleMovies);
+  const visibleMovies = filterMovies(request.movies, { ...filters, query: searchTerm });
+  const scoreSummary = summarizeScores(visibleMovies);
 
   function handleSearch(query) {
-    const title = query.trim();
-    setFilters({ year: "", minimumRating: 0 });
-    setRequest({ status: title === "" ? "idle" : "loading", movies: [], error: "" });
-    setSearch({ query: title });
+    setSearchTerm(query.trim());
+    setFilters({ year: "", minimumScore: 0 });
+  }
+
+  function handleRetry() {
+    setRequest({ status: "loading", movies: [], error: "" });
+    setLoadAttempt(attempt => attempt + 1);
   }
 
   useEffect(() => {
-    if (!search || search.query === "") {
-      return;
-    }
-
     const controller = new AbortController();
     let active = true;
 
     async function loadMovies() {
       try {
-        const results = await searchMovies(search.query, controller.signal);
+        const results = await getMovies(controller.signal);
         const movies = normalizeMovies(results);
 
         if (active) {
@@ -45,7 +44,7 @@ export default function App() {
         }
 
         const message = error instanceof TypeError
-          ? "Could not connect to the movie service. Check your connection and try again."
+          ? "Could not connect to the film service. Check your connection and try again."
           : error.message;
         setRequest({ status: "error", movies: [], error: message });
       }
@@ -57,19 +56,17 @@ export default function App() {
       active = false;
       controller.abort();
     };
-  }, [search]);
+  }, [loadAttempt]);
 
   return (
     <main>
       <header>
         <h1>Movie Night</h1>
-        <p>Find something worth watching.</p>
+        <p>Studio Ghibli edition · an unofficial film finder.</p>
       </header>
-
       <SearchForm onSearch={handleSearch} />
-
       <section aria-labelledby="movies-heading">
-        <h2 id="movies-heading">Search results</h2>
+        <h2 id="movies-heading">Ghibli film catalogue</h2>
         <MovieFilters
           years={years}
           filters={filters}
@@ -77,36 +74,32 @@ export default function App() {
           disabled={request.status !== "success" || request.movies.length === 0}
         />
         <p role="status">
-          {request.status === "idle" && "Search for a movie title to get started."}
-          {request.status === "loading" && `Searching for "${search.query}"…`}
-          {request.status === "success" && `Showing ${visibleMovies.length} of ${request.movies.length} loaded movies for "${search.query}".`}
+          {request.status === "loading" && "Loading the Ghibli film catalogue…"}
+          {request.status === "success" && `Showing ${visibleMovies.length} of ${request.movies.length} loaded movies.`}
         </p>
         {request.status === "error" && (
           <div>
             <p className="error" role="alert">{request.error}</p>
-            <button type="button" onClick={() => handleSearch(search.query)}>Try again</button>
+            <button type="button" onClick={handleRetry}>Try again</button>
           </div>
         )}
         <div aria-busy={request.status === "loading"}>
           {request.status === "success" && (
             <>
-              <RatingSummary summary={ratingSummary} />
+              <ScoreSummary summary={scoreSummary} />
               <MovieList
                 movies={visibleMovies}
                 emptyMessage={request.movies.length === 0
-                  ? "No movies found. Try another title."
-                  : "No movies match these filters. Try another year or a lower rating."}
+                  ? "The film catalogue is empty."
+                  : "No movies match your search and filters. Try another title, year, or score."}
               />
             </>
           )}
         </div>
       </section>
       <footer aria-label="Credits">
-        <a href="https://www.themoviedb.org/">
-          <img className="tmdb-logo" src="https://www.themoviedb.org/assets/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg" alt="TMDB" width="110" />
-        </a>
-        <p>Movie data from TMDB.</p>
-        <p>This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+        <p>Film data from the <a href="https://ghibliapi.vercel.app/">Studio Ghibli API</a>, an unofficial, fan-maintained service.</p>
+        <p>Critic scores are the Rotten Tomatoes percentages supplied by the API.</p>
       </footer>
     </main>
   );

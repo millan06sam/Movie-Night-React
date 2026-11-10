@@ -1,56 +1,71 @@
+function parseNumber(value) {
+  if ((typeof value !== "string" && typeof value !== "number") || String(value).trim() === "") {
+    return null;
+  }
+
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
 export function normalizeMovies(results) {
   const seenIds = new Set();
 
   return results
     .filter(movie => {
       if (!movie || typeof movie !== "object" || Array.isArray(movie)
-        || !Number.isInteger(movie.id) || movie.id <= 0 || seenIds.has(movie.id)) {
+        || typeof movie.id !== "string" || movie.id.trim() === "" || seenIds.has(movie.id)) {
         return false;
       }
 
       seenIds.add(movie.id);
       return true;
     })
-    .map(movie => ({
-      id: movie.id,
-      title: typeof movie.title === "string" && movie.title.trim() !== "" ? movie.title : "Untitled movie",
-      year: typeof movie.release_date === "string" && /^[1-9]\d{3}-/.test(movie.release_date)
-        ? Number(movie.release_date.slice(0, 4)) : null,
-      rating: Number.isFinite(movie.vote_average) && movie.vote_average >= 0 && movie.vote_average <= 10
-        && Number.isFinite(movie.vote_count) && movie.vote_count > 0 ? movie.vote_average : null,
-      overview: typeof movie.overview === "string" && movie.overview.trim() !== ""
-        ? movie.overview : "No summary available.",
-    }));
+    .map(movie => {
+      const year = parseNumber(movie.release_date);
+      const score = parseNumber(movie.rt_score);
+
+      return {
+        id: movie.id,
+        title: typeof movie.title === "string" && movie.title.trim() !== "" ? movie.title : "Untitled movie",
+        year: Number.isInteger(year) && year >= 1000 && year <= 9999 ? year : null,
+        score: score !== null && score >= 0 && score <= 100 ? score : null,
+        overview: typeof movie.description === "string" && movie.description.trim() !== ""
+          ? movie.description : "No summary available.",
+      };
+    });
 }
 
 export function getMovieYears(movies) {
   return [...new Set(movies.map(movie => movie.year))]
     .filter(year => year !== null)
-    .sort((first, second) => second - first);
+    .toSorted((first, second) => second - first);
 }
 
-export function filterMovies(movies, { year = "", minimumRating = 0 } = {}) {
+export function filterMovies(movies, { query = "", year = "", minimumScore = 0 } = {}) {
+  const search = query.trim().toLowerCase();
+
   return movies.filter(movie => {
+    const matchesTitle = movie.title.toLowerCase().includes(search);
     const matchesYear = year === "" || movie.year === Number(year);
-    const matchesRating = minimumRating === 0
-      || (movie.rating !== null && movie.rating >= minimumRating);
-    return matchesYear && matchesRating;
+    const matchesScore = minimumScore === 0
+      || (movie.score !== null && movie.score >= minimumScore);
+    return matchesTitle && matchesYear && matchesScore;
   });
 }
 
-export function summarizeRatings(movies) {
+export function summarizeScores(movies) {
   const totals = movies.reduce((summary, movie) => {
-    if (Number.isFinite(movie.rating) && movie.rating >= 0 && movie.rating <= 10) {
-      summary.ratedCount++;
-      summary.ratingSum += movie.rating;
+    if (Number.isFinite(movie.score) && movie.score >= 0 && movie.score <= 100) {
+      summary.scoredCount++;
+      summary.scoreSum += movie.score;
     }
 
     return summary;
-  }, { ratedCount: 0, ratingSum: 0 });
+  }, { scoredCount: 0, scoreSum: 0 });
 
   return {
-    ratedCount: totals.ratedCount,
-    unratedCount: movies.length - totals.ratedCount,
-    averageRating: totals.ratedCount === 0 ? null : totals.ratingSum / totals.ratedCount,
+    scoredCount: totals.scoredCount,
+    unscoredCount: movies.length - totals.scoredCount,
+    averageScore: totals.scoredCount === 0 ? null : totals.scoreSum / totals.scoredCount,
   };
 }

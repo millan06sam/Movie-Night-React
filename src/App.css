@@ -49,7 +49,7 @@ a:focus-visible {
 }
 
 fieldset,
-.rating-summary {
+.score-summary {
   min-width: 0;
   margin: 20px 0;
   padding: 16px;
@@ -58,7 +58,7 @@ fieldset,
 }
 
 .filter-controls,
-.rating-totals {
+.score-totals {
   display: flex;
   flex-wrap: wrap;
   gap: 16px 24px;
@@ -72,17 +72,17 @@ select {
   max-width: 100%;
 }
 
-.rating-summary h3 {
+.score-summary h3 {
   margin-top: 0;
 }
 
-.rating-totals dd {
+.score-totals dd {
   margin: 4px 0 0;
   font-weight: 700;
 }
 
 fieldset p,
-.rating-summary p {
+.score-summary p {
   margin-bottom: 0;
   font-size: 13px;
 }
@@ -90,10 +90,6 @@ fieldset p,
 footer {
   margin-top: 32px;
   font-size: 12px;
-}
-
-.tmdb-logo {
-  height: auto;
 }
 
 .movie-card {

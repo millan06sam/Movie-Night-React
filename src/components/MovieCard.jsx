@@ -5,7 +5,7 @@ export default function MovieCard({ movie }) {
       <p className="movie-meta">
         {movie.year ?? "Year unknown"}
         {" · "}
-        {movie.rating === null ? "Not rated" : `${movie.rating.toFixed(1)} / 10`}
+        {movie.score === null ? "No critic score" : `${movie.score}% critic score`}
       </p>
       <details>
         <summary>Read synopsis</summary>

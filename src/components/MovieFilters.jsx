@@ -15,20 +15,20 @@ export default function MovieFilters({ years, filters, onChange, disabled }) {
           </select>
         </div>
         <div>
-          <label htmlFor="rating-filter">Minimum rating</label>
+          <label htmlFor="score-filter">Minimum critic score</label>
           <select
-            id="rating-filter"
-            value={filters.minimumRating}
-            onChange={event => onChange({ ...filters, minimumRating: Number(event.target.value) })}
+            id="score-filter"
+            value={filters.minimumScore}
+            onChange={event => onChange({ ...filters, minimumScore: Number(event.target.value) })}
           >
-            <option value={0}>Any rating (including unrated)</option>
-            {[5, 6, 7, 8, 9].map(rating => (
-              <option key={rating} value={rating}>{rating} / 10</option>
+            <option value={0}>Any score (including missing scores)</option>
+            {[50, 60, 70, 80, 90].map(score => (
+              <option key={score} value={score}>{score}%</option>
             ))}
           </select>
         </div>
       </div>
-      <p>Filters apply to the first page of results already loaded.</p>
+      <p>Search and filters apply to the loaded Ghibli catalogue. An empty search shows all titles.</p>
     </fieldset>
   );
 }

@@ -1,27 +1,21 @@
-export async function searchMovies(query, signal) {
-  const parameters = new URLSearchParams({ query });
-  const response = await fetch(`/api/movies?${parameters}`, { signal });
+export async function getMovies(signal) {
+  const response = await fetch("https://ghibliapi.vercel.app/films", { signal });
 
   if (!response.ok) {
-    let message = "Movie search failed. Please try again.";
-
-    try {
-      const error = await response.json();
-      if (typeof error?.message === "string") {
-        message = error.message;
-      }
-    } catch {
-      message = "The movie service returned an unreadable error. Please try again.";
-    }
-
-    throw new Error(message);
+    throw new Error(`The film service could not load the catalogue (HTTP ${response.status}). Please try again.`);
   }
 
-  const data = await response.json();
+  let data;
 
-  if (!Array.isArray(data?.results)) {
-    throw new Error("The movie service returned unexpected data. Please try again.");
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("The film service returned unreadable data. Please try again.");
   }
 
-  return data.results;
+  if (!Array.isArray(data)) {
+    throw new Error("The film service returned unexpected data. Please try again.");
+  }
+
+  return data;
 }
