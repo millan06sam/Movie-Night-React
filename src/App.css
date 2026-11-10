@@ -1,0 +1,32 @@
+.movie-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.movie-card {
+  padding: 20px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  background: #fff;
+  overflow-wrap: anywhere;
+}
+
+.movie-card h3 {
+  margin: 0 0 12px;
+}
+
+.movie-meta {
+  color: #555;
+  font-size: 14px;
+}
+
+summary {
+  cursor: pointer;
+}
+
+summary:focus-visible {
+  outline: 3px solid #444;
+  outline-offset: 4px;
+}
